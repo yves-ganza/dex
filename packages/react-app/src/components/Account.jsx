@@ -1,4 +1,5 @@
-import { Button } from "antd";
+import { Button, Popover } from "antd";
+import Blockies from "react-blockies";
 import React from "react";
 import { useThemeSwitcher } from "react-css-theme-switcher";
 
@@ -66,7 +67,7 @@ export default function Account({
           key="logoutbutton"
           style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
           shape="round"
-          size="large"
+          size="medium"
           onClick={logoutOfWeb3Modal}
         >
           logout
@@ -78,7 +79,7 @@ export default function Account({
           key="loginbutton"
           style={{ verticalAlign: "top", marginLeft: 8, marginTop: 4 }}
           shape="round"
-          size="large"
+          size="medium"
           /* type={minimized ? "default" : "primary"}     too many people just defaulting to MM and having a bad time */
           onClick={loadWeb3Modal}
         >
@@ -87,13 +88,12 @@ export default function Account({
       );
     }
   }
-  const display = minimized ? (
-    ""
-  ) : (
+
+  const content = (
     <span>
       {web3Modal && web3Modal.cachedProvider ? (
         <>
-          {address && <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} />}
+          {address && <Address address={address} ensProvider={mainnetProvider} blockExplorer={blockExplorer} minimized={true}/>}
           <Balance address={address} provider={localProvider} price={price} />
           <Wallet
             address={address}
@@ -132,6 +132,15 @@ export default function Account({
       )}
     </span>
   );
+  const minimizedDisplay = (
+    <Popover content={content}>
+      <Button type="text">
+        <Blockies seed={address ? address.toLowerCase() : ""} size={8} scale={4} />
+      </Button>
+    </Popover>
+  );
+
+  const display = minimized ? minimizedDisplay : content;
 
   return (
     <div>

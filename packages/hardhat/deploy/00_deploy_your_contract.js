@@ -1,6 +1,7 @@
 // deploy/00_deploy_your_contract.js
 
 const { ethers } = require("hardhat");
+const {parseEther, parseUnits} = ethers.utils;
 
 const localChainId = "31337";
 
@@ -17,21 +18,44 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   const { deployer } = await getNamedAccounts();
   const chainId = await getChainId();
 
+  console.log(`Deployer account: ${deployer}`);
+
   await deploy("Balloons", {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
     from: deployer,
-    args: [1000],
+    args: [parseUnits("1000")],
     log: true,
     waitConfirmations: 5,
   });
 
   // Getting a previously deployed contract
   const Balloons = await ethers.getContract("Balloons", deployer);
+
+  await deploy("Dex", {
+    from: deployer,
+    args: [Balloons.address],
+    log: true,
+  });
+
+  // console.log(`👉 Transfering 10 tokens to frontend address...`);
+  // await Balloons.transfer("0xa7341724c1d8371808E1f084Ec39b0ab51BB6ABf", parseUnits("10"));
+  // console.log("✅ Done!");
+
+  const Dex = await ethers.getContract("Dex", deployer);
+
+  console.log(`Approving Dex ${Dex.address} to take some Balloons from main account`);
+  const tx = await Balloons.approve(Dex.address, parseUnits("990"));
+  await tx.wait();
+  console.log("✅ Approved!");
+
+  console.log('Init exchange...');
+  await Dex.init(parseUnits("990"), {value: parseEther("5")});
+  console.log("✅ Done!");
+
   /*  await YourContract.setPurpose("Hello");
   
     To take ownership of yourContract using the ownable library uncomment next line and add the 
     address you want to be the owner. 
-    // await yourContract.transferOwnership(YOUR_ADDRESS_HERE);
 
     //const yourContract = await ethers.getContractAt('YourContract', "0xaAC799eC2d00C013f1F11c37E654e59B0429DF6A") //<-- if you want to instantiate a version of a contract at a specific address!
   */
@@ -76,4 +100,4 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   //   console.error(error);
   // }
 };
-module.exports.tags = ["Balloons"];
+module.exports.tags = ["Balloons", "Dex"];

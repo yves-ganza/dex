@@ -17,6 +17,7 @@ import "./App.css";
 import {
   Account,
   Contract,
+  Dex,
   Faucet,
   GasGauge,
   Header,
@@ -170,14 +171,6 @@ function App(props) {
     "0x34aA3F359A9D614239015126635CE7732c18fDF3",
   ]);
 
-  // keep track of a variable from the contract in the local React state:
-  const purpose = useContractReader(readContracts, "YourContract", "purpose");
-
-  /*
-  const addressFromENS = useResolveName(mainnetProvider, "austingriffith.eth");
-  console.log("🏷 Resolved austingriffith.eth as:",addressFromENS)
-  */
-
   //
   // 🧫 DEBUG 👨🏻‍🔬
   //
@@ -290,159 +283,54 @@ function App(props) {
           </div>
         </Col>
       </Row>
-      <Menu style={{ textAlign: "center", marginTop: 40 }} selectedKeys={[location.pathname]} mode="horizontal">
-        <Menu.Item key="/">
-          <Link to="/">App Home</Link>
-        </Menu.Item>
-        <Menu.Item key="/debug">
-          <Link to="/debug">Debug Contracts</Link>
-        </Menu.Item>
-        <Menu.Item key="/hints">
-          <Link to="/hints">Hints</Link>
-        </Menu.Item>
-        <Menu.Item key="/exampleui">
-          <Link to="/exampleui">ExampleUI</Link>
-        </Menu.Item>
-        <Menu.Item key="/mainnetdai">
-          <Link to="/mainnetdai">Mainnet DAI</Link>
-        </Menu.Item>
-        <Menu.Item key="/subgraph">
-          <Link to="/subgraph">Subgraph</Link>
-        </Menu.Item>
-      </Menu>
-
-      <Switch>
-        <Route exact path="/">
-          {/* pass in any web3 props to this Home component. For example, yourLocalBalance */}
-          <Home yourLocalBalance={yourLocalBalance} readContracts={readContracts} />
-        </Route>
-        <Route exact path="/debug">
-          {/*
-                🎛 this scaffolding is full of commonly used components
-                this <Contract/> component will automatically parse your ABI
-                and give you a form to interact with it locally
-            */}
-
-          <Contract
-            name="Balloons"
-            price={price}
-            signer={userSigner}
-            provider={localProvider}
-            address={address}
-            blockExplorer={blockExplorer}
-            contractConfig={contractConfig}
-          />
-          <Contract
-            name="Dex"
-            price={price}
-            signer={userSigner}
-            provider={localProvider}
-            address={address}
-            blockExplorer={blockExplorer}
-            contractConfig={contractConfig}
-          />
-        </Route>
-        <Route path="/hints">
-          <Hints
-            address={address}
-            yourLocalBalance={yourLocalBalance}
-            mainnetProvider={mainnetProvider}
-            price={price}
-          />
-        </Route>
-        <Route path="/exampleui">
-          <ExampleUI
-            address={address}
-            userSigner={userSigner}
-            mainnetProvider={mainnetProvider}
-            localProvider={localProvider}
-            yourLocalBalance={yourLocalBalance}
-            price={price}
-            tx={tx}
-            writeContracts={writeContracts}
-            readContracts={readContracts}
-            purpose={purpose}
-          />
-        </Route>
-        <Route path="/mainnetdai">
-          <Contract
-            name="DAI"
-            customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.DAI}
-            signer={userSigner}
-            provider={mainnetProvider}
-            address={address}
-            blockExplorer="https://etherscan.io/"
-            contractConfig={contractConfig}
-            chainId={1}
-          />
-          {/*
-            <Contract
-              name="UNI"
-              customContract={mainnetContracts && mainnetContracts.contracts && mainnetContracts.contracts.UNI}
-              signer={userSigner}
-              provider={mainnetProvider}
-              address={address}
-              blockExplorer="https://etherscan.io/"
-            />
-            */}
-        </Route>
-        <Route path="/subgraph">
-          <Subgraph
-            subgraphUri={props.subgraphUri}
-            tx={tx}
-            writeContracts={writeContracts}
-            mainnetProvider={mainnetProvider}
-          />
-        </Route>
-      </Switch>
-
+      <Row justify="center">
+        <Dex
+          address={address}
+          tx={tx}
+          writeContracts={writeContracts}
+          localProvider={localProvider}
+          mainnetProvider={mainnetProvider}
+          readContracts={readContracts}
+          blockExplorer={blockExplorer}
+          contractConfig={contractConfig}
+          signer={userSigner}
+          price={price}
+          localChainId={localChainId}
+        />
+      </Row>
+      {/* <Contract
+        name={"DEX"}
+        address={address}
+        signer={userSigner}
+        provider={localProvider}
+        contractConfig={contractConfig}
+        price={price}
+        show={["deposit", "withdraw", "ethToToken", "tokenToEth"]}
+      />
+      <Contract
+        title={"🎈 Balloons"}
+        name={"Balloons"}
+        address={address}
+        signer={userSigner}
+        provider={localProvider}
+        contractConfig={contractConfig}
+        price={price}
+        show={["balanceOf", "approve"]}
+      /> */}
+      <Row align="middle" gutter={[4, 4]}>
+        <Col span={12} style={{ padding: "8px 16px" }}>
+          {
+            /*  if the local provider has a signer, let's show the faucet:  */
+            faucetAvailable && <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
+          }
+        </Col>
+      </Row>
       <ThemeSwitch />
-
       {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
-      <div style={{ position: "fixed", textAlign: "right", right: 0, top: 0, padding: 10 }}>
+      <div style={{ position: "fixed", textAlign: "right", right: 0, top: 32, padding: 10 }}>
         {yourLocalBalance.lte(ethers.BigNumber.from("0")) && (
           <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
         )}
-      </div>
-
-      {/* 🗺 Extra UI like gas price, eth price, faucet, and support: */}
-      <div style={{ position: "fixed", textAlign: "left", left: 0, bottom: 20, padding: 10 }}>
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={8}>
-            <Ramp price={price} address={address} networks={NETWORKS} />
-          </Col>
-
-          <Col span={8} style={{ textAlign: "center", opacity: 0.8 }}>
-            <GasGauge gasPrice={gasPrice} />
-          </Col>
-          <Col span={8} style={{ textAlign: "center", opacity: 1 }}>
-            <Button
-              onClick={() => {
-                window.open("https://t.me/joinchat/KByvmRe5wkR-8F_zz6AjpA");
-              }}
-              size="large"
-              shape="round"
-            >
-              <span style={{ marginRight: 8 }} role="img" aria-label="support">
-                💬
-              </span>
-              Support
-            </Button>
-          </Col>
-        </Row>
-
-        <Row align="middle" gutter={[4, 4]}>
-          <Col span={24}>
-            {
-              /*  if the local provider has a signer, let's show the faucet:  */
-              faucetAvailable ? (
-                <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-              ) : (
-                ""
-              )
-            }
-          </Col>
-        </Row>
       </div>
     </div>
   );

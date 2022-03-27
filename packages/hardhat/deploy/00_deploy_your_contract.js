@@ -31,7 +31,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   // Getting a previously deployed contract
   const Balloons = await ethers.getContract("Balloons", deployer);
 
-  await deploy("Dex", {
+  await deploy("DEX", {
     from: deployer,
     args: [Balloons.address],
     log: true,
@@ -41,7 +41,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   // await Balloons.transfer("0xa7341724c1d8371808E1f084Ec39b0ab51BB6ABf", parseUnits("10"));
   // console.log("✅ Done!");
 
-  const Dex = await ethers.getContract("Dex", deployer);
+  const Dex = await ethers.getContract("DEX", deployer);
 
   console.log(`Approving Dex ${Dex.address} to take some Balloons from main account`);
   const tx = await Balloons.approve(Dex.address, parseUnits("990"));
@@ -49,7 +49,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   console.log("✅ Approved!");
 
   console.log('Init exchange...');
-  await Dex.init(parseUnits("990"), {value: parseEther("5")});
+  await Dex.init(parseUnits("5"), {value: parseEther("5")});
   console.log("✅ Done!");
 
   /*  await YourContract.setPurpose("Hello");

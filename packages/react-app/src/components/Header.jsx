@@ -18,6 +18,6 @@ export default function Header({link, title, subTitle}) {
 
 Header.defaultProps = {
   link: "https://github.com/austintgriffith/scaffold-eth",
-  title: "Dex",
+  title: "💱 Minimum Viable Decentralized Exchange",
   subTitle: "",
 }

@@ -3,7 +3,7 @@ pragma solidity >=0.8.0 <=0.9.0;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract Dex {
+contract DEX {
     
     IERC20 token;
     uint256 public totalLiquidity;
@@ -41,5 +41,32 @@ contract Dex {
         payable(msg.sender).transfer(eth_bought);
         require(token.transferFrom(msg.sender, address(this), token_amount));
         return eth_bought;
-    }  
+    }
+
+    function deposit() public payable returns(uint256){
+        uint256 token_reserve = token.balanceOf(address(this));
+        uint256 eth_reserve = address(this).balance - msg.value;
+        uint256 token_amount = msg.value * (token_reserve / eth_reserve) + 1;
+        uint256 liquidity_minted = msg.value * (totalLiquidity / eth_reserve);
+
+        liquidity[msg.sender] += liquidity_minted;
+        totalLiquidity += liquidity_minted;
+
+        require(token.transferFrom(msg.sender, address(this), token_amount));
+        return liquidity_minted;
+    } 
+
+    function withdraw(uint256 amount) public returns(uint256, uint256){
+        uint256 token_reserve = token.balanceOf(address(this));
+        uint256 eth_reserve = address(this).balance;
+        uint256 eth_amount = amount * (eth_reserve / totalLiquidity);
+        uint256 token_amount = amount * (token_reserve / totalLiquidity);
+
+        liquidity[msg.sender] -= eth_amount;
+        totalLiquidity -= eth_amount;
+
+        payable(msg.sender).transfer(eth_amount);
+        token.transfer(msg.sender, token_amount);
+        return (eth_amount, token_amount);
+    } 
 }

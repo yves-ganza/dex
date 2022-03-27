@@ -49,8 +49,8 @@ contract DEX {
         uint256 token_amount = msg.value * (token_reserve / eth_reserve) + 1;
         uint256 liquidity_minted = msg.value * (totalLiquidity / eth_reserve);
 
-        liquidity[msg.sender] += liquidity_minted;
-        totalLiquidity += liquidity_minted;
+        liquidity[msg.sender] = liquidity[msg.sender] + liquidity_minted;
+        totalLiquidity = totalLiquidity + liquidity_minted;
 
         require(token.transferFrom(msg.sender, address(this), token_amount));
         return liquidity_minted;
@@ -62,8 +62,8 @@ contract DEX {
         uint256 eth_amount = amount * (eth_reserve / totalLiquidity);
         uint256 token_amount = amount * (token_reserve / totalLiquidity);
 
-        liquidity[msg.sender] -= eth_amount;
-        totalLiquidity -= eth_amount;
+        liquidity[msg.sender] = liquidity[msg.sender] - eth_amount;
+        totalLiquidity = totalLiquidity - eth_amount;
 
         payable(msg.sender).transfer(eth_amount);
         token.transfer(msg.sender, token_amount);

@@ -90,7 +90,7 @@ function NetworkDisplay({
     }
   } else {
     networkDisplay = USE_NETWORK_SELECTOR ? null : (
-      <div style={{ zIndex: -1, padding: 16, color: targetNetwork.color }}>
+      <div style={{ padding: 16 }}>
         {targetNetwork.name}
       </div>
     );

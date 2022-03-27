@@ -1,4 +1,4 @@
-import { Button, Col, Menu, Row } from "antd";
+import { Button, Col, Menu, Row, Layout } from "antd";
 import "antd/dist/antd.css";
 import {
   useBalance,
@@ -20,7 +20,7 @@ import {
   Dex,
   Faucet,
   GasGauge,
-  Header,
+  Header as CustomHeader,
   Ramp,
   ThemeSwitch,
   NetworkDisplay,
@@ -36,6 +36,8 @@ import deployedContracts from "./contracts/hardhat_contracts.json";
 import { Transactor, Web3ModalSetup } from "./helpers";
 import { Home, ExampleUI, Hints, Subgraph } from "./views";
 import { useStaticJsonRPC } from "./hooks";
+
+const {Header, Footer, Content} = Layout
 
 const { ethers } = require("ethers");
 /*
@@ -242,14 +244,13 @@ function App(props) {
   const faucetAvailable = localProvider && localProvider.connection && targetNetwork.name.indexOf("local") !== -1;
 
   return (
-    <div className="App">
-      {/* ✏️ Edit the header and change the title to your project name */}
-      <Row align="middle" justify="space-between">
+    <Layout className="App">
+      <Row>
         <Col span={12}>
-          <Header />
+          <CustomHeader />
         </Col>
-        <Col span={12}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end"}}>
+        <Col span={12} style={{ padding: 8 }}>
+          <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
             {USE_NETWORK_SELECTOR && (
               <div style={{ marginRight: 20 }}>
                 <NetworkSwitch
@@ -272,6 +273,7 @@ function App(props) {
               blockExplorer={blockExplorer}
               minimized
             />
+            <TokenBalance name="Balloons" contracts={readContracts} img="🎈" address={address} />
             <NetworkDisplay
               NETWORKCHECK={NETWORKCHECK}
               localChainId={localChainId}
@@ -282,57 +284,43 @@ function App(props) {
             />
           </div>
         </Col>
-      </Row>
-      <Row justify="center">
-        <Dex
-          address={address}
-          tx={tx}
-          writeContracts={writeContracts}
-          localProvider={localProvider}
-          mainnetProvider={mainnetProvider}
-          readContracts={readContracts}
-          blockExplorer={blockExplorer}
-          contractConfig={contractConfig}
-          signer={userSigner}
-          price={price}
-          localChainId={localChainId}
-        />
-      </Row>
-      {/* <Contract
-        name={"DEX"}
-        address={address}
-        signer={userSigner}
-        provider={localProvider}
-        contractConfig={contractConfig}
-        price={price}
-        show={["deposit", "withdraw", "ethToToken", "tokenToEth"]}
-      />
-      <Contract
-        title={"🎈 Balloons"}
-        name={"Balloons"}
-        address={address}
-        signer={userSigner}
-        provider={localProvider}
-        contractConfig={contractConfig}
-        price={price}
-        show={["balanceOf", "approve"]}
-      /> */}
-      <Row align="middle" gutter={[4, 4]}>
-        <Col span={12} style={{ padding: "8px 16px" }}>
-          {
-            /*  if the local provider has a signer, let's show the faucet:  */
-            faucetAvailable && <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
-          }
-        </Col>
-      </Row>
-      <ThemeSwitch />
-      {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
-      <div style={{ position: "fixed", textAlign: "right", right: 0, top: 32, padding: 10 }}>
-        {yourLocalBalance.lte(ethers.BigNumber.from("0")) && (
-          <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
-        )}
-      </div>
-    </div>
+        </Row>
+      <Content>
+        <Row align="middle">
+          <Dex
+            address={address}
+            tx={tx}
+            writeContracts={writeContracts}
+            localProvider={localProvider}
+            mainnetProvider={mainnetProvider}
+            readContracts={readContracts}
+            blockExplorer={blockExplorer}
+            contractConfig={contractConfig}
+            signer={userSigner}
+            price={price}
+            localChainId={localChainId}
+          />
+        </Row>
+        <Row align="middle" gutter={[4, 4]}>
+          <Col span={12} style={{ padding: "8px 16px" }}>
+            {
+              /*  if the local provider has a signer, let's show the faucet:  */
+              faucetAvailable && <Faucet localProvider={localProvider} price={price} ensProvider={mainnetProvider} />
+            }
+          </Col>
+        </Row>
+        <ThemeSwitch />
+        {/* 👨‍💼 Your account is in the top right with a wallet at connect options */}
+        <div style={{ position: "fixed", textAlign: "right", right: 0, top: 32, padding: 10 }}>
+          {yourLocalBalance.lte(ethers.BigNumber.from("0")) && (
+            <FaucetHint localProvider={localProvider} targetNetwork={targetNetwork} address={address} />
+          )}
+        </div>
+      </Content>
+      <Footer>
+        Made with <span style={{ padding: 8 }}>💗</span> by {"0xB1898A42cfE1a82F9A8C363E48ce05394c64fE70"}
+      </Footer>
+    </Layout>
   );
 }
 

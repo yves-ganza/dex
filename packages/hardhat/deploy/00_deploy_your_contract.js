@@ -37,9 +37,9 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
     log: true,
   });
 
-  console.log(`👉 Transfering 10 tokens to frontend address...`);
-  await Balloons.transfer("0xa7341724c1d8371808E1f084Ec39b0ab51BB6ABf", parseUnits("10"));
-  console.log("✅ Done!");
+  // console.log(`👉 Transfering 10 tokens to frontend address...`);
+  // await Balloons.transfer("0xa7341724c1d8371808E1f084Ec39b0ab51BB6ABf", parseUnits("10"));
+  // console.log("✅ Done!");
 
   const Dex = await ethers.getContract("DEX", deployer);
 
@@ -49,7 +49,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   console.log("✅ Approved!");
 
   console.log('Init exchange...');
-  await Dex.init(parseUnits("5"), {value: parseEther("5")});
+  await Dex.init(parseUnits("10"), {value: parseEther("0.001")});
   console.log("✅ Done!");
 
   /*  await YourContract.setPurpose("Hello");
